@@ -1,19 +1,14 @@
+# Use a minimal base image with Python 3.9 installed
+FROM python:3.9-slim
 
-# Use a lightweight Python image as the base
-FROM python:3.9-slim-buster
-
-# Set the working directory inside the container
+# Set the working directory inside the container to /app
 WORKDIR /app
 
-# Copy the frontend requirements file and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy all files from the current directory on the host to the container's /app directory
+COPY . .
 
-# Copy the Streamlit application code
-COPY app.py .
+# Install Python dependencies listed in requirements.txt
+RUN pip3 install -r requirements.txt
 
-# Expose the port on which the Streamlit app will run
-EXPOSE 8501
-
-# Command to run the Streamlit application
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Define the command to run the Streamlit app on port 8501 and make it accessible externally
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.enableXsrfProtection=false"]
