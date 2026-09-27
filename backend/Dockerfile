@@ -1,20 +1,16 @@
-
-# Use a lightweight Python image as the base
-FROM python:3.9-slim-buster
+FROM python:3.9-slim
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt .
+# Copy all files from the current directory to the container's working directory
+COPY . .
+
+# Install dependencies from the requirements file without using cache to reduce image size
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code and the trained model
-COPY main.py .
-COPY superkart_model.joblib .
-
-# Expose the port on which the Flask app will run
-EXPOSE 7860
-
-# Command to run the Flask application
-CMD ["python", "main.py"]
+# Define the command to start the application using Gunicorn with 4 worker processes
+# - `-w 4`: Uses 4 worker processes for handling requests
+# - `-b 0.0.0.0:7860`: Binds the server to port 7860 on all network interfaces
+# - `app:superkart_api`: Runs the Flask app (assuming `app.py` contains the Flask instance named `superkart_api`)
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:7860", "app:superkart_api"]
