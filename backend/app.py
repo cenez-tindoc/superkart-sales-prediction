@@ -4,12 +4,19 @@ import numpy as np
 import joblib  # For loading the serialized model
 import pandas as pd  # For data manipulation
 from flask import Flask, request, jsonify  # For creating the Flask API
+import os
 
 # Initialize Flask app with a name
 superkart_api = Flask("SuperKart")
 
+# Define the model path, assuming it's downloaded to the current directory
+MODEL_PATH = "superkart_model.joblib"
+
 # Load the trained model
-model = joblib.load("superkart_model.joblib")
+# Check if the model file exists
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError(f"Model file not found at {MODEL_PATH}. Ensure it is downloaded or present.")
+model = joblib.load(MODEL_PATH)
 
 # Define a route for the home page
 @superkart_api.get('/')
@@ -65,4 +72,5 @@ def predict_sales_batch():
 
 # Run the Flask app in debug mode
 if __name__ == '__main__':
-    superkart_api.run(debug=True)
+    # Use 0.0.0.0 to make it accessible externally in a container
+    superkart_api.run(debug=True, host='0.0.0.0', port=7860)
