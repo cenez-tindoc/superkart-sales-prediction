@@ -3,12 +3,11 @@ FROM python:3.9-slim
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy requirements.txt and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy all application files (including superkart_model.joblib)
+# Copy all files from the current directory to the container's working directory
 COPY . .
+
+# Install dependencies from the requirements file without using cache to reduce image size
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Define the command to start the application using Gunicorn with 4 worker processes
 # - `-w 4`: Uses 4 worker processes for handling requests
